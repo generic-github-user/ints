@@ -34,10 +34,16 @@
   (:documentation "A generic edge class")
 )
 
-(defmethod add-node ((G graph) (N node))
-  (push N (nodes G))
-  (incf (size G))
-)
+(defmethod add-node ((G graph) (N node) &optional d)
+  (let ((i (index G N)))
+	(if (or d (not i))
+	  (progn
+	    (push N (nodes G))
+	    (incf (size G))
+	  )
+	i)))
+
+;(defgeneric add-edge ((G graph)
 
 (defmethod add-edge ((G graph) (e edge))
   (push e (edges G)))
@@ -52,7 +58,7 @@
 (defparameter mg (make-instance 'graph))
 
 (loop for i from 0 to num do (
-  add-node mg (make-instance 'node :data i)))
+  add-node mg (make-instance 'node :data i) T))
 
 ; Via https://bese.common-lisp.dev/docs/arnesi/html/api/function_005FIT.BESE.ARNESI_003A_003ANOOP.html
 (defun noop (&rest args)
@@ -84,13 +90,9 @@
 				(loop for op in (list '(+ "sum") '(* "product") '(- "difference") '(floor "quotient")) do
 					;(print op)
 					;(print (funcall (car op) 2 4))
-					(let* (
-						       (sum (make-instance 'node :data (funcall (car op) (data a) (data b))))
-						       (i (index mg sum))
-					       )
-						(if (not i) (setq i (add-node mg sum)))
+					(let* ((sum (make-instance 'node :data (funcall (car op) (data a) (data b)))))
 						; (string (cdr op))
-						(add-edge mg (make-instance 'edge :data (cdr op) :path (list ai bi i)))
+						(add-edge mg (make-instance 'edge :data (cdr op) :path (list ai bi (add-node mg sum T))))
 					)
 				)
 			)
