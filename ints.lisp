@@ -87,7 +87,7 @@
 				(format T "~d ~d~%" (data a) (data b))
 				(if (zerop (rem (data a) (data b)))
 					(add-edge mg (make-instance 'edge :data "divisible" :path (list ai bi))))
-				(loop for op in (list '(+ "sum") '(* "product") '(- "difference") '(floor "quotient")) do
+				(loop for op in (list '(+ "sum") '(* "product") '(- "difference") '(floor "quotient") '(mod "modulo")) do
 					;(print op)
 					;(print (funcall (car op) 2 4))
 					(let* ((sum (make-instance 'node :data (funcall (car op) (data a) (data b)))))
@@ -95,6 +95,13 @@
 						(add-edge mg (make-instance 'edge :data (cdr op) :path (list ai bi (add-node mg sum T))))
 					)
 				)
+				(if (prime (data a)) (add-edge mg (make-instance 'edge :data "prime" :path (list ai))))
+				(loop for n in (list 2 3 4 5) do
+					(add-edge mg (make-instance 'edge :data "exp" :path (list
+						ai
+						(add-node mg (make-instance 'node :data n) T)
+						(add-node mg (make-instance 'node :data (expt (data a) n)) T)
+				     ))))
 			)
 		)
 	)
