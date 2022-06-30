@@ -33,3 +33,16 @@
      :type T))
   (:documentation "A generic edge class")
 )
+
+(defmethod add-node ((G graph) (N node))
+  (push N (nodes G))
+  (incf (size G))
+)
+
+(defmethod add-edge ((G graph) (e edge))
+  (push e (edges G)))
+
+(defmethod index ((G graph) (n node))
+  (position n (nodes G) :test #'equal))
+
+(describe 'graph)
