@@ -66,7 +66,6 @@
   (declare (ignore args))
   (values))
 
-
 (defun prime (n)
 	(loop for x from 2 to (isqrt n)
 		never (zerop (rem n x))
@@ -108,3 +107,12 @@
 )
 
 
+; Based on https://stackoverflow.com/a/34897978
+(defmethod print-object ((obj graph) out)
+  (with-slots (nodes edges) obj
+    (print-unreadable-object (obj out :type t)
+      (format out "~<~:_nodes = ~A ~:_edges = ~A~:>" (list nodes edges)))))
+
+(defmethod print-object ((N node) out)
+  (print-unreadable-object (N out :type t)
+    (format out "~s" (data N))))
