@@ -116,3 +116,11 @@
 (defmethod print-object ((N node) out)
   (print-unreadable-object (N out :type t)
     (format out "~s" (data N))))
+
+(with-open-file (outfile "intdata.lisp"
+			 :direction :output
+			 :if-exists :supersede)
+    (print mg outfile))
+
+(print-object (nth 20 (nodes mg)) *standard-output*)
+; (print-node (nth 20 (nodes mg)))
