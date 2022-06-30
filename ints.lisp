@@ -81,6 +81,18 @@
 				(format T "~d ~d~%" (data a) (data b))
 				(if (zerop (rem (data a) (data b)))
 					(add-edge mg (make-instance 'edge :data "divisible" :path (list ai bi))))
+				(loop for op in (list '(+ "sum") '(* "product") '(- "difference") '(floor "quotient")) do
+					;(print op)
+					;(print (funcall (car op) 2 4))
+					(let* (
+						       (sum (make-instance 'node :data (funcall (car op) (data a) (data b))))
+						       (i (index mg sum))
+					       )
+						(if (not i) (setq i (add-node mg sum)))
+						; (string (cdr op))
+						(add-edge mg (make-instance 'edge :data (cdr op) :path (list ai bi i)))
+					)
+				)
 			)
 		)
 	)
