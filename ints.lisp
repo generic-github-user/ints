@@ -65,3 +65,25 @@
 	(loop for x from 2 to (isqrt n)
 		never (zerop (rem n x))
 		finally (return T)))
+
+(setf *random-state* (make-random-state t))
+(loop repeat iterations do 
+	(let* (
+			(ai (- (size mg) (random num) 1))
+			(bi (- (size mg) (random num) 1))
+			(a (nth ai (nodes mg)))
+			(b (nth bi (nodes mg)))
+		)
+		;(if (and (eql 'floor (car op)) (zerop (data b)))
+		(if (zerop (data b))
+			(noop)
+			(progn
+				(format T "~d ~d~%" (data a) (data b))
+				(if (zerop (rem (data a) (data b)))
+					(add-edge mg (make-instance 'edge :data "divisible" :path (list ai bi))))
+			)
+		)
+	)
+)
+
+
