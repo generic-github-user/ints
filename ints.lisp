@@ -48,6 +48,7 @@
 
 (defvar num 30)
 (defvar iterations 20)
+(defvar verbose NIL)
 (defparameter mg (make-instance 'graph))
 
 ; Initialize the database with a range of integers
@@ -81,10 +82,10 @@
 			(progn
 			  	;(print-object mg *standard-output*) (terpri)
 				;(format T "~d ~d~%" ai bi)
-				(format T "~d ~d~%" (data a) (data b))
+				(if verbose (format T "~d ~d~%" (data a) (data b)))
 				;(terpri)
 
-				(print "Checking divisibility") (terpri)
+				(if verbose (progn (print "Checking divisibility") (terpri)))
 				(if (zerop (rem (data a) (data b)))
 					(add-edge mg (make-instance 'edge :data "divisible" :path (list ai bi))))
 				(loop for op in (list '(+ "sum") '(* "product") '(- "difference") '(floor "quotient") '(mod "modulo")) do
