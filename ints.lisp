@@ -49,7 +49,7 @@
   (push e (edges G)))
 
 (defmethod index ((G graph) (n node))
-  (position n (nodes G) :test #'equal))
+  (position n (nodes G) :test (lambda (a b) (= (data a) (data b)))))
 
 (describe 'graph)
 
@@ -57,6 +57,7 @@
 (defvar iterations 20)
 (defparameter mg (make-instance 'graph))
 
+; Initialize the database with a range of integers
 (loop for i from 0 to num do (
   add-node mg (make-instance 'node :data i) T))
 
@@ -71,19 +72,24 @@
 		never (zerop (rem n x))
 		finally (return T)))
 
-(setf *random-state* (make-random-state t))
-(loop repeat iterations do 
-	(let* (
-			(ai (- (size mg) (random num) 1))
-			(bi (- (size mg) (random num) 1))
-			(a (nth ai (nodes mg)))
-			(b (nth bi (nodes mg)))
+; Based on https://stackoverflow.com/a/34897978
+(defmethod print-object ((G graph) out)
+  (with-slots (size) G
+    (print-unreadable-object (G out :type t)
+      (format out "size: ~a" (list size)))))
+
+(defun check-pair (ai bi)
+	(let (
+			(a (nth (- (size mg) ai 1) (nodes mg)))
+			(b (nth (- (size mg) bi 1) (nodes mg)))
 		)
-		;(if (and (eql 'floor (car op)) (zerop (data b)))
 		(if (zerop (data b))
 			(noop)
 			(progn
+			  	(print-object mg *standard-output*) (terpri)
+				(format T "~d ~d~%" ai bi)
 				(format T "~d ~d~%" (data a) (data b))
+				(terpri)
 				(if (zerop (rem (data a) (data b)))
 					(add-edge mg (make-instance 'edge :data "divisible" :path (list ai bi))))
 				(loop for op in (list '(+ "sum") '(* "product") '(- "difference") '(floor "quotient") '(mod "modulo")) do
@@ -99,19 +105,29 @@
 					(add-edge mg (make-instance 'edge :data "exp" :path (list
 						ai
 						(add-node mg (make-instance 'node :data n) T)
-						(add-node mg (make-instance 'node :data (expt (data a) n)) T)
-				     ))))
-			)
-		)
-	)
-)
+						(add-node mg (make-instance 'node :data (expt (data a) n)) T)))))))))
+
+; (setf *random-state* (make-random-state t))
+; (loop repeat iterations do 
+; 	(let* (
+; 			(ai (- (size mg) (random num) 1))
+; 			(bi (- (size mg) (random num) 1))
+; 		)
+; 		;(if (and (eql 'floor (car op)) (zerop (data b)))
+; 		(check-pair ai bi)
+; 	)
+; )
+
+(defun check-int (i)
+	;(loop for n from 0 to (data (nth (- (size mg) i) (nodes mg))) do
+	(loop for n from 0 to 20 do
+	      ;(check-pair i (index mg (make-instance 'node :data n)))))
+	      (check-pair i n)))
+
+(check-int 5)
+;(loop for n from 0 to 10 do (check-int n))
 
 
-; Based on https://stackoverflow.com/a/34897978
-(defmethod print-object ((obj graph) out)
-  (with-slots (nodes edges) obj
-    (print-unreadable-object (obj out :type t)
-      (format out "~<~:_nodes = ~A ~:_edges = ~A~:>" (list nodes edges)))))
 
 (defmethod print-object ((N node) out)
   (print-unreadable-object (N out :type t)
