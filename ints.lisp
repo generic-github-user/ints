@@ -1,45 +1,21 @@
 (defclass graph ()
-  ((nodes
-     :accessor nodes
-     :initform (make-hash-table)
-     :type hash-table)
-   (edges
-     :accessor edges
-     :initform (list))
-   (size
-     :accessor size
-     :initform 0
-     :type integer))
+  ((nodes :accessor nodes :initform (make-hash-table) :type hash-table)
+   (edges :accessor edges :initform (list))
+   (size :accessor size :initform 0 :type integer))
    (:documentation "A generic graph class")
 )
 
 (defclass node ()
-  ((data
-     :accessor data
-     :initarg :data)
-   (edges
-     :accessor edges
-     :initform (list))
-   (adjacent
-     :accessor adjacent
-     :initform (list))
-   (degree
-     :accessor degree
-     :initform 0))
+  ((data :accessor data :initarg :data)
+   (edges :accessor edges :initform (list))
+   (adjacent :accessor adjacent :initform (list))
+   (degree :accessor degree :initform 0))
   (:documentation "A generic node class")
 )
 
 (defclass edge ()
-  ((path
-     :accessor path
-     :initarg :path
-     ;:initform (cons nil nil)
-     ;:type cons)
-     :type list)
-   (data
-     :accessor data
-     :initarg :data
-     :type T))
+  ((path :accessor path :initarg :path :type list)
+   (data :accessor data :initarg :data :type T))
   (:documentation "A generic edge class")
 )
 
@@ -138,16 +114,15 @@
 (check-int 5)
 ;(loop for n from 0 to 10 do (check-int n))
 
-
-
 (defmethod print-object ((N node) out)
   (print-unreadable-object (N out :type t)
     (format out "~s" (data N))))
 
-(with-open-file (outfile "intdata.lisp"
+(defmethod write-graph (G)
+  (with-open-file (outfile "intdata.lisp"
 			 :direction :output
 			 :if-exists :supersede)
-    (print mg outfile))
+    (print mg outfile)))
 
 ; (print-object (nth 20 (nodes mg)) *standard-output*)
 ; (print-node (nth 20 (nodes mg)))
