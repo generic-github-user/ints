@@ -121,6 +121,21 @@
 (maphash (lambda (key value)
 	   (setf (gethash 'ndivisors (info value)) (count-if (lambda (e) (and (equal (data e) "divisible") (equal (car (path e)) (data value)))) (edges mg)))) (nodes mg))
 
+;(maphash (lambda (key value) (print (data value))) (nodes mg))
+(loop for n from 0 to num do
+	(progn
+	     (format T "**~A**~&" (data (gethash n (nodes mg))))
+	     (format T "Divisible by ~{~A~^, ~}~&" (sort (mapcar
+			(lambda (e) (data (gethash (nth 1 (path e)) (nodes mg))))
+			;(lambda (e) (cdr (path e)))
+			(remove-if-not (lambda (e)
+			(and
+				(equal (data e) "divisible")
+				(equal (data (gethash (car (path e)) (nodes mg))) n)))
+			(edges mg))) #'<))
+	     (format T "Analyzed ~a relationships ~&" (count-if (lambda (e) (some (lambda (p) (equal p n)) (path e))) (edges mg)))
+	     (terpri)))
+
 (defmethod print-object ((N node) out)
   (print-unreadable-object (N out :type t)
     (format out "~s" (data N))))
