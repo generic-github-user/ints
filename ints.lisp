@@ -36,6 +36,12 @@
 	  )
 	i)))
 
+(defmethod get-node ((G graph) (index integer))
+	(gethash index (nodes G)))
+
+(defmethod get-value ((G graph) (index integer))
+	(data (get-node G index)))
+
 ;(defgeneric add-edge ((G graph)
 
 (defmethod add-edge ((G graph) (e edge))
@@ -80,8 +86,8 @@
 
 (defun check-pair (ai bi)
 	(let (
-			(a (gethash ai (nodes mg)))
-			(b (gethash bi (nodes mg)))
+			(a (get-node mg ai))
+			(b (get-node mg bi))
 		)
 		(if (zerop (data b))
 			(noop)
@@ -131,14 +137,14 @@
 ;(maphash (lambda (key value) (print (data value))) (nodes mg))
 (loop for n from 0 to num do
 	(progn
-	     (format T "**~A**~&" (data (gethash n (nodes mg))))
+	     (format T "**~A**~&" (get-value mg n))
 	     (format T "Divisible by ~{~A~^, ~}~&" (sort (mapcar
-			(lambda (e) (data (gethash (nth 1 (path e)) (nodes mg))))
+			(lambda (e) (get-value mg (nth 1 (path e))))
 			;(lambda (e) (cdr (path e)))
 			(remove-if-not (lambda (e)
 			(and
 				(equal (data e) "divisible")
-				(equal (data (gethash (car (path e)) (nodes mg))) n)))
+				(equal (get-value mg (car (path e))) n)))
 			(edges mg))) #'<))
 	     (format T "Analyzed ~a relationships ~&" (count-if (lambda (e) (some (lambda (p) (equal p n)) (path e))) (edges mg)))
 	     (terpri)))
