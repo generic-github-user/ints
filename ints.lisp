@@ -9,7 +9,8 @@
   ((data :accessor data :initarg :data)
    (edges :accessor edges :initform (list))
    (adjacent :accessor adjacent :initform (list))
-   (degree :accessor degree :initform 0))
+   (degree :accessor degree :initform 0)
+   (info :accessor info :initform (make-hash-table)))
   (:documentation "A generic node class")
 )
 
@@ -45,7 +46,7 @@
 
 (describe 'graph)
 
-(defvar num 100)
+(defvar num 30)
 (defvar iterations 20)
 (defparameter mg (make-instance 'graph))
 
@@ -78,10 +79,12 @@
 		(if (zerop (data b))
 			(noop)
 			(progn
-			  	(print-object mg *standard-output*) (terpri)
-				(format T "~d ~d~%" ai bi)
+			  	;(print-object mg *standard-output*) (terpri)
+				;(format T "~d ~d~%" ai bi)
 				(format T "~d ~d~%" (data a) (data b))
-				(terpri)
+				;(terpri)
+
+				(print "Checking divisibility") (terpri)
 				(if (zerop (rem (data a) (data b)))
 					(add-edge mg (make-instance 'edge :data "divisible" :path (list ai bi))))
 				(loop for op in (list '(+ "sum") '(* "product") '(- "difference") '(floor "quotient") '(mod "modulo")) do
@@ -99,6 +102,7 @@
 						(add-node mg (make-instance 'node :data n) T)
 						(add-node mg (make-instance 'node :data (expt (data a) n)) T)))))))))
 
+
 ; (setf *random-state* (make-random-state t))
 ; (loop repeat iterations do 
 ; 	(let* (
@@ -110,9 +114,12 @@
 ; 	)
 ; )
 
-(defun check-int (i) (loop for n from 0 to 20 do (check-pair i n)))
-(check-int 5)
-;(loop for n from 0 to 10 do (check-int n))
+(defun check-int (i) (loop for n from 0 to i do (check-pair i n)))
+(loop for n from 0 to num do (check-int n))
+
+; Compute summary properties
+(maphash (lambda (key value)
+	   (setf (gethash 'ndivisors (info value)) (count-if (lambda (e) (and (equal (data e) "divisible") (equal (car (path e)) (data value)))) (edges mg)))) (nodes mg))
 
 (defmethod print-object ((N node) out)
   (print-unreadable-object (N out :type t)
