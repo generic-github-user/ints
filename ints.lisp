@@ -20,6 +20,12 @@
   (:documentation "A generic edge class")
 )
 
+(defun make-node (data)
+	(make-instance 'node :data data))
+
+(defun make-edge (data path)
+	(make-instance 'edge :data data :path path))
+
 (defmethod add-node ((G graph) (N node) &optional d)
   (let ((i (index G N)))
 	(if (or d (not i))
@@ -53,7 +59,7 @@
 
 ; Initialize the database with a range of integers
 (loop for i from 0 to num do (
-  add-node mg (make-instance 'node :data i) T))
+  add-node mg (make-node i) T))
 
 ; Via https://bese.common-lisp.dev/docs/arnesi/html/api/function_005FIT.BESE.ARNESI_003A_003ANOOP.html
 (defun noop (&rest args)
@@ -87,21 +93,21 @@
 
 				(if verbose (progn (print "Checking divisibility") (terpri)))
 				(if (zerop (rem (data a) (data b)))
-					(add-edge mg (make-instance 'edge :data "divisible" :path (list ai bi))))
+					(add-edge mg (make-edge "divisible" (list ai bi))))
 				(loop for op in (list '(+ "sum") '(* "product") '(- "difference") '(floor "quotient") '(mod "modulo")) do
 					;(print op)
 					;(print (funcall (car op) 2 4))
-					(let* ((sum (make-instance 'node :data (funcall (car op) (data a) (data b)))))
+					(let* ((sum (make-node (funcall (car op) (data a) (data b)))))
 						; (string (cdr op))
-						(add-edge mg (make-instance 'edge :data (cdr op) :path (list ai bi (add-node mg sum T))))
+						(add-edge mg (make-edge (cdr op) (list ai bi (add-node mg sum T))))
 					)
 				)
-				(if (prime (data a)) (add-edge mg (make-instance 'edge :data "prime" :path (list ai))))
+				(if (prime (data a)) (add-edge mg (make-edge "prime" (list ai))))
 				(loop for n in (list 2 3 4 5) do
-					(add-edge mg (make-instance 'edge :data "exp" :path (list
+					(add-edge mg (make-edge "exp" (list
 						ai
-						(add-node mg (make-instance 'node :data n) T)
-						(add-node mg (make-instance 'node :data (expt (data a) n)) T)))))))))
+						(add-node mg (make-node n) T)
+						(add-node mg (make-node (expt (data a) n)) T)))))))))
 
 
 ; (setf *random-state* (make-random-state t))
