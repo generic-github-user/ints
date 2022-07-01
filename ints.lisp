@@ -1,8 +1,8 @@
 (defclass graph ()
   ((nodes
      :accessor nodes
-     :initform (list)
-     :type list)
+     :initform (make-hash-table)
+     :type hash-table)
    (edges
      :accessor edges
      :initform (list))
@@ -47,7 +47,8 @@
   (let ((i (index G N)))
 	(if (or d (not i))
 	  (progn
-	    (push N (nodes G))
+	    ;(push N (nodes G))
+	    (setf (gethash (size G) (nodes G)) N)
 	    (incf (size G))
 	  )
 	i)))
@@ -57,8 +58,14 @@
 (defmethod add-edge ((G graph) (e edge))
   (push e (edges G)))
 
+(defgeneric geneq (a b))
+(defmethod geneq ((a node) (b node))
+  (equal (data a) (data b)))
+
 (defmethod index ((G graph) (n node))
-  (position n (nodes G) :test (lambda (a b) (= (data a) (data b)))))
+  ;(position n (nodes G) :test (lambda (key) (= (data a) (data b)))))
+  (loop for key being the hash-key of (nodes G)
+	when (geneq (gethash key (nodes G)) n) return key finally (return NIL)))
 
 (describe 'graph)
 
@@ -89,8 +96,8 @@
 
 (defun check-pair (ai bi)
 	(let (
-			(a (nth (- (size mg) ai 1) (nodes mg)))
-			(b (nth (- (size mg) bi 1) (nodes mg)))
+			(a (gethash ai (nodes mg)))
+			(b (gethash bi (nodes mg)))
 		)
 		(if (zerop (data b))
 			(noop)
@@ -127,10 +134,7 @@
 ; 	)
 ; )
 
-(defun check-int (i)
-	(loop for n from 0 to 20 do
-	      (check-pair i n)))
-
+(defun check-int (i) (loop for n from 0 to 20 do (check-pair i n)))
 (check-int 5)
 ;(loop for n from 0 to 10 do (check-int n))
 
@@ -145,5 +149,5 @@
 			 :if-exists :supersede)
     (print mg outfile))
 
-(print-object (nth 20 (nodes mg)) *standard-output*)
+; (print-object (nth 20 (nodes mg)) *standard-output*)
 ; (print-node (nth 20 (nodes mg)))
