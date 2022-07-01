@@ -16,7 +16,16 @@
 (defclass node ()
   ((data
      :accessor data
-     :initarg :data))
+     :initarg :data)
+   (edges
+     :accessor edges
+     :initform (list))
+   (adjacent
+     :accessor adjacent
+     :initform (list))
+   (degree
+     :accessor degree
+     :initform 0))
   (:documentation "A generic node class")
 )
 
@@ -119,9 +128,7 @@
 ; )
 
 (defun check-int (i)
-	;(loop for n from 0 to (data (nth (- (size mg) i) (nodes mg))) do
 	(loop for n from 0 to 20 do
-	      ;(check-pair i (index mg (make-instance 'node :data n)))))
 	      (check-pair i n)))
 
 (check-int 5)
